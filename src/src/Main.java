@@ -1,30 +1,28 @@
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+/**
+ * Simulates a banking system with multiple threads.
+ */
 public class Main {
     public static void main(String[] args) {
-        /*
-        Challenge Exercise
-            Expand the ATM withdrawal system into a fully functioning banking
-            system that supports multiple transactions.
+        BankAccount sharedAccount = new BankAccount(1000);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
 
-            1. Modify the BankAccount class to:
-            o Support multiple users depositing and withdrawing
-            money simultaneously.
-            o Implement synchronization to handle concurrent
-            transactions properly.
+        executor.submit(new DepositThread(sharedAccount, 300, 1)); // Thread 1: Deposits 300 every second
+        executor.submit(new WithdrawThread(sharedAccount, 200, 2)); // Thread 2: Withdraws 200 every two seconds
+        executor.submit(new WithdrawThread(sharedAccount, 500, 3)); // Thread 3: Withdraws 500 every three seconds
+        executor.submit(new InterestThread(sharedAccount, 0.02, 5)); // Bonus: Adds 2% interest every 5 seconds
 
-            2. Create a Banking Simulation with:
-            o A shared BankAccount starting with 1000 balance.
-            o Thread 1: Deposits 300 every second.
-            o Thread 2: Withdraws 200 every two seconds.
-            o Thread 3: Withdraws 500 every three seconds.
-            o Ensure transactions wait for deposits if the balance is too low.
+        //Shutdown
+        try {
+            executor.awaitTermination(60, TimeUnit.SECONDS);
+            executor.shutdownNow();
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
 
-            3. Add logging to track:
-            o Each deposit and withdrawal.
-            o Current balance after each transaction.
-            o Any failed withdrawals due to insufficient funds.
-
-                Bonus: Introduce an interest system that adds 2% interest to the
-                balance every 5 seconds using a separate thread.
-         */
     }
 }
